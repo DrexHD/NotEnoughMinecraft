@@ -94,7 +94,7 @@ public class ComputerModel extends BlockModel {
         this.main = ItemDisplayElementUtil.createSimple(ModItems.COMPUTER);
 
         this.camera = new TextDisplayElement();
-        this.camera.setOffset(new Vec3(0, 0, .8f));
+        this.camera.setOffset(new Vec3(0, 0, 1f));
         this.camera.setRotation(0, 180);
 
         this.horse = new SimpleEntityElement(EntityType.HORSE);
