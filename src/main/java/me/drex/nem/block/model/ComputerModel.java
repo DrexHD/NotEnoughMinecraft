@@ -109,9 +109,6 @@ public class ComputerModel extends BlockModel {
 
                 if (player.getUUID() == ComputerModel.this.controllerUUID) {
                     PlayerAction.USE.perform(fakePlayer);
-                } else if (ComputerModel.this.controllerUUID == null) {
-                    setCamera(player);
-                    setController(player);
                 }
             }
 
@@ -135,7 +132,15 @@ public class ComputerModel extends BlockModel {
         this.addElement(this.main);
         this.addElement(this.display);
         this.addElement(this.camera);
-        this.addElement(this.interaction);
+    }
+
+    public boolean interact(ServerPlayer player) {
+        if (ComputerModel.this.controllerUUID == null) {
+            setCamera(player);
+            setController(player);
+            return true;
+        }
+        return false;
     }
 
     private void setCamera(ServerPlayer controller) {
@@ -216,6 +221,8 @@ public class ComputerModel extends BlockModel {
             fakePlayer.getInventory().setItem(i, new ItemStack(defaultHotbar[i]));
         }
 
+        this.addElement(interaction);
+
         this.controllerUUID = controller.getUUID();
         controlledComputers.put(this.controllerUUID, this);
     }
@@ -225,6 +232,7 @@ public class ComputerModel extends BlockModel {
         controlledComputers.remove(this.controllerUUID);
         this.fakePlayer = null;
         this.controllerUUID = null;
+        this.removeElement(interaction);
         this.clearScreen();
     }
 
