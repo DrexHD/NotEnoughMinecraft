@@ -22,7 +22,7 @@ public class ModItems {
 
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
-        return register(ResourceKey.create(Registries.ITEM, id), properties -> new FactoryBlockItem(block, properties), new Item.Properties());
+        return register(ResourceKey.create(Registries.ITEM, id), properties -> new FactoryBlockItem(block, properties), new Item.Properties().useBlockDescriptionPrefix());
     }
 
     private static <T extends Item> T register(ResourceKey<Item> resourceKey, Function<Item.Properties, T> function, Item.Properties properties) {
