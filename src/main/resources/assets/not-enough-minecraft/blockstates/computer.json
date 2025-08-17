@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "not-enough-minecraft:block/computer"
+    }
+  }
+}
