@@ -1,3 +1,4 @@
 {
-  "block.not-enough-minecraft.computer": "Computer"
+  "block.not-enough-minecraft.computer": "Computer",
+  "itemGroup.not-enough-minecraft": "NotEnoughMinecraft"
 }
