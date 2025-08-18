@@ -208,8 +208,8 @@ public class ComputerModel extends BlockModel {
     private void removeCamera(ServerPlayer controller) {
         controller.connection.send(new ClientboundSetCameraPacket(controller));
         controller.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.CHANGE_GAME_MODE, controller.gameMode().getId()));
-        controller.connection.send(new ClientboundPlayerPositionPacket(controller.getId(), PositionMoveRotation.of(controller), EnumSet.noneOf(Relative.class)));
         controller.connection.send(VirtualEntityUtils.createRidePacket(horse.getEntityId(), new int[]{}));
+        controller.connection.send(new ClientboundPlayerPositionPacket(controller.getId(), PositionMoveRotation.of(controller), EnumSet.noneOf(Relative.class)));
         controller.connection.send(new ClientboundPlayerRotationPacket(controller.getYRot(), controller.getXRot()));
         controller.connection.send(new ClientboundSetHeldSlotPacket(controller.getInventory().getSelectedSlot()));
     }
