@@ -2,9 +2,11 @@
   "required": true,
   "package": "me.drex.nem.mixin",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "me.drex.nem.util.NEMMixinConfigPlugin",
   "mixins": [
     "ConnectionMixin",
-    "ServerGamePacketListenerImplMixin"
+    "ServerGamePacketListenerImplMixin",
+    "compat.cca.ComponentKeyMixin"
   ],
   "injectors": {
     "defaultRequire": 1
