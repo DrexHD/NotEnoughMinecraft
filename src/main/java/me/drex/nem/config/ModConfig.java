@@ -1,4 +1,4 @@
-package de.tomalbrc.cameraobscura;
+package me.drex.nem.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class ModConfig {
-    private static final Path CONFIG_FILE_PATH = FabricLoader.getInstance().getConfigDir().resolve("camera-obscura.json");
+    private static final Path CONFIG_FILE_PATH = FabricLoader.getInstance().getConfigDir().resolve("not-enough-minecraft.json");
     private static ModConfig instance;
 
     private static final Gson gson = new GsonBuilder()
@@ -22,9 +22,7 @@ public class ModConfig {
             .setPrettyPrinting()
             .create();
 
-    public int renderDistance = 128;
-
-    public boolean showSystemMessages = false;
+    public int renderDistance = 64;
 
     public boolean renderEntities = false;
     public int renderEntitiesAmount = 20;
@@ -32,11 +30,7 @@ public class ModConfig {
     public boolean fullbright = false;
     public int fov = 70;
     public int biomeBlend = 1;
-
-    public ResourceLocation cameraItem = ResourceLocation.withDefaultNamespace("spyglass");
-    public boolean cameraConsumesItem = true;
-    public ResourceLocation cameraConsumeItem = ResourceLocation.withDefaultNamespace("map");
-    public int commandPermissionLevel = 2;
+    public int renderThreadCount = 4;
 
     public static ModConfig getInstance() {
         if (instance == null) {

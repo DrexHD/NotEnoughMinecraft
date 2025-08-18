@@ -1,6 +1,6 @@
 package de.tomalbrc.cameraobscura.render.renderer;
 
-import de.tomalbrc.cameraobscura.ModConfig;
+import me.drex.nem.config.ModConfig;
 import net.minecraft.util.Mth;
 
 public interface Renderer<T> {

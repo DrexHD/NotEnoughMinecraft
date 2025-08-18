@@ -1,6 +1,6 @@
 package de.tomalbrc.cameraobscura.world;
 
-import de.tomalbrc.cameraobscura.ModConfig;
+import me.drex.nem.config.ModConfig;
 import de.tomalbrc.cameraobscura.json.CachedResourceLocationDeserializer;
 import de.tomalbrc.cameraobscura.util.Constants;
 import de.tomalbrc.cameraobscura.util.RPHelper;
@@ -16,7 +16,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 

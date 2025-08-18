@@ -1,6 +1,7 @@
 package me.drex.nem.block.model;
 
 import com.mojang.authlib.GameProfile;
+import me.drex.nem.config.ModConfig;
 import de.tomalbrc.cameraobscura.render.renderer.ImageRenderer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
@@ -303,7 +304,7 @@ public class ComputerModel extends BlockModel {
 
     private void renderImage(FakePlayer fakePlayer) {
         if (!rendering.compareAndSet(false, true)) return;
-        var renderer = new ImageRenderer(fakePlayer, DISPLAY_WIDTH, DISPLAY_HEIGHT, 64);
+        var renderer = new ImageRenderer(fakePlayer, DISPLAY_WIDTH, DISPLAY_HEIGHT, ModConfig.getInstance().renderDistance);
         CompletableFuture.supplyAsync(renderer::render).thenAcceptAsync(pixels -> {
             try {
                 if (controllerUUID == null) return;
@@ -316,7 +317,7 @@ public class ComputerModel extends BlockModel {
             } finally {
                 rendering.set(false);
             }
-        });
+        }, fakePlayer.getServer());
     }
 
     private void renderHotbar(FakePlayer fakePlayer) {

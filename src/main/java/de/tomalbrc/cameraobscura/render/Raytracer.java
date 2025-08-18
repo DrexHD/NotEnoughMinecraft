@@ -1,6 +1,6 @@
 package de.tomalbrc.cameraobscura.render;
 
-import de.tomalbrc.cameraobscura.ModConfig;
+import me.drex.nem.config.ModConfig;
 import de.tomalbrc.cameraobscura.color.BlockColors;
 import de.tomalbrc.cameraobscura.color.MiscColors;
 import de.tomalbrc.cameraobscura.render.model.RenderModel;
@@ -14,7 +14,6 @@ import de.tomalbrc.cameraobscura.world.BlockIterator;
 import de.tomalbrc.cameraobscura.world.EntityIterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
@@ -34,7 +33,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 import java.util.Comparator;
