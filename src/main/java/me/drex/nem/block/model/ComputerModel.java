@@ -33,10 +33,7 @@ import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.Brightness;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -63,6 +60,7 @@ public class ComputerModel extends BlockModel {
     private final ItemDisplayElement display;
     public final InteractionElement interaction;
     public final TextDisplayElement camera;
+    public final TextDisplayElement debug;
     private final SimpleEntityElement horse;
     private final ItemDisplayElement main;
     private final ItemDisplayElement[] hotbar = new ItemDisplayElement[9];
@@ -77,6 +75,10 @@ public class ComputerModel extends BlockModel {
     private UUID controllerUUID;
     private FakePlayer fakePlayer;
 
+    // debug
+    private boolean showDebug = false;
+    private final ArrayDeque<Long> frameTimes = new ArrayDeque<>();
+
     public ComputerModel(BlockState blockState) {
         this.screen = new ItemStack(Items.TRIAL_KEY);
         this.screen.set(DataComponents.ITEM_MODEL, NotEnoughMinecraft.id("screen"));
@@ -90,11 +92,14 @@ public class ComputerModel extends BlockModel {
             this.addElement(this.hotbar[i]);
         }
 
-        this.clearScreen();
-
         this.main = ItemDisplayElementUtil.createSimple(ModItems.COMPUTER);
 
         this.camera = new TextDisplayElement();
+        this.debug = new TextDisplayElement();
+        this.debug.setBackground(0);
+        this.debug.setTextAlignment(Display.TextDisplay.Align.LEFT);
+
+        this.clearScreen();
 
         this.horse = new SimpleEntityElement(EntityType.HORSE);
         horse.setInvisible(true);
@@ -120,9 +125,12 @@ public class ComputerModel extends BlockModel {
 
             @Override
             public void pickItem(ServerPlayer player, boolean includeData) {
-//                if (player.getUUID() == ComputerModel.this.controllerUUID) {
-//                    fakePlayer.teleportTo(player.getX(), player.getY(), player.getZ());
-//                }
+                if (showDebug) {
+                    removeElement(debug);
+                } else {
+                    addElement(debug);
+                }
+                showDebug = !showDebug;
             }
         });
         this.interaction.setSize(1.1f, 1.1f);
@@ -147,6 +155,12 @@ public class ComputerModel extends BlockModel {
             hotbarTransformation.scale(0.05f);
             this.hotbar[i].setTransformation(hotbarTransformation);
         }
+
+        Matrix4f debugTransformation = new Matrix4f();
+        debugTransformation.rotate(rotation);
+        debugTransformation.translate(-0.26f, 3f / 16f, 5.7f / 16);
+        debugTransformation.scale(.2f);
+        this.debug.setTransformation(debugTransformation);
 
         Matrix4f displayTransform = new Matrix4f();
         displayTransform.rotate(rotation);
@@ -230,6 +244,8 @@ public class ComputerModel extends BlockModel {
         renderImage(fakePlayer);
         renderHotbar(fakePlayer);
         setFakePlayerInput(fakePlayer, input);
+
+        updateBlockState(this.blockState());
     }
 
     @Override
@@ -318,6 +334,18 @@ public class ComputerModel extends BlockModel {
                 rendering.set(false);
             }
         }, fakePlayer.getServer());
+        updateFps();
+    }
+
+    private void updateFps() {
+        long now = System.currentTimeMillis();
+        frameTimes.addLast(now);
+
+        long cutoff = now - 1_000L;
+        while (!frameTimes.isEmpty() && frameTimes.getFirst() < cutoff) {
+            frameTimes.removeFirst();
+        }
+        debug.setText(Component.literal("FPS: " + frameTimes.size()));
     }
 
     private void renderHotbar(FakePlayer fakePlayer) {
@@ -339,5 +367,6 @@ public class ComputerModel extends BlockModel {
         for (int i = 0; i < 9; i++) {
             this.hotbar[i].setItem(ItemStack.EMPTY);
         }
+        this.debug.setText(Component.literal(""));
     }
 }
