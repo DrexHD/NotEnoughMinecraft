@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-08-18
+### Added
+- Computer block rotation
+
 ## [1.1.0] - 2025-08-18
 ### Changed
 - Remove interaction entity when computer is not used

@@ -5,17 +5,20 @@ import de.tomalbrc.cameraobscura.render.renderer.ImageRenderer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.*;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import me.drex.nem.NotEnoughMinecraft;
+import me.drex.nem.block.ComputerBlock;
 import me.drex.nem.item.ModItems;
 import me.drex.nem.logic.ComputerFakePlayer;
 import me.drex.nem.logic.FakeClientConnection;
 import me.drex.nem.logic.PlayerAction;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.chat.Component;
@@ -27,6 +30,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.Brightness;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -40,8 +44,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -70,32 +76,24 @@ public class ComputerModel extends BlockModel {
     private UUID controllerUUID;
     private FakePlayer fakePlayer;
 
-    public ComputerModel() {
+    public ComputerModel(BlockState blockState) {
         this.screen = new ItemStack(Items.TRIAL_KEY);
         this.screen.set(DataComponents.ITEM_MODEL, NotEnoughMinecraft.id("screen"));
         this.display = new ItemDisplayElement(this.screen);
         this.display.setBrightness(Brightness.FULL_BRIGHT);
         this.display.setViewRange(0.1f);
-        this.display.setOffset(new Vec3(0, -1 / 16f, 5.5f / 16));
+
         for (int i = 0; i < 9; i++) {
             this.hotbar[i] = ItemDisplayElementUtil.createSimple(Items.STONE);
-            this.hotbar[i].setScale(new Vector3f(0.05f));
             this.hotbar[i].setItemDisplayContext(ItemDisplayContext.GUI);
-            this.hotbar[i].setOffset(new Vec3(i / 14f - 0.28f, -4 / 16f, 5.7f / 16));
             this.addElement(this.hotbar[i]);
         }
 
         this.clearScreen();
 
-        Matrix4f matrix4f = new Matrix4f();
-        matrix4f.scale(.8f, .8f, 1f);
-        this.display.setTransformation(matrix4f);
-
         this.main = ItemDisplayElementUtil.createSimple(ModItems.COMPUTER);
 
         this.camera = new TextDisplayElement();
-        this.camera.setOffset(new Vec3(0, 0, 1f));
-        this.camera.setRotation(0, 180);
 
         this.horse = new SimpleEntityElement(EntityType.HORSE);
         horse.setInvisible(true);
@@ -132,6 +130,44 @@ public class ComputerModel extends BlockModel {
         this.addElement(this.main);
         this.addElement(this.display);
         this.addElement(this.camera);
+        this.updateBlockState(blockState);
+    }
+
+    private void updateBlockState(BlockState blockState) {
+        Direction dir = blockState.getValue(ComputerBlock.FACING);
+        var yaw = 180 - Mth.wrapDegrees(dir.toYRot());
+
+        Quaternionf rotation = new Quaternionf();
+        rotation.rotateY((float) Math.toRadians(yaw));
+        for (int i = 0; i < 9; i++) {
+            Matrix4f hotbarTransformation = new Matrix4f();
+            hotbarTransformation.rotate(rotation);
+            hotbarTransformation.translate(i / 14f - 0.28f, -4 / 16f, 5.7f / 16);
+            hotbarTransformation.scale(0.05f);
+            this.hotbar[i].setTransformation(hotbarTransformation);
+        }
+
+        Matrix4f displayTransform = new Matrix4f();
+        displayTransform.rotate(rotation);
+        displayTransform.translate(0, -1 / 16f, 5.5f / 16);
+        displayTransform.scale(.8f, .8f, 1f);
+        this.display.setTransformation(displayTransform);
+
+        Matrix4f mainTransform = new Matrix4f();
+        mainTransform.rotate(rotation);
+        this.main.setTransformation(mainTransform);
+
+        Vector3f offset = new Vector3f(0, 0, 1).rotate(rotation);
+
+        this.camera.setOffset(new Vec3(offset));
+        this.camera.setRotation(0, 180 - yaw);
+    }
+
+    @Override
+    public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+        if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+            updateBlockState(this.blockState());
+        }
     }
 
     public boolean interact(ServerPlayer player) {
