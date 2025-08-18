@@ -58,11 +58,11 @@ publishMods {
 	modLoaders.add("fabric")
 	modLoaders.add("quilt")
 
-
 	modrinth {
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		projectId = "sbnEegTp"
 		minecraftVersions.add(project.minecraft_version)
+		requires("fabric-api", "polymer")
 	}
 	github {
 		accessToken = providers.environmentVariable("GITHUB_TOKEN")
