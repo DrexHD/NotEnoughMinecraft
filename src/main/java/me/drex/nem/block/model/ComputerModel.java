@@ -249,15 +249,12 @@ public class ComputerModel extends BlockModel {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    protected void onAttachmentRemoved(HolderAttachment oldAttachment) {
+        super.onAttachmentRemoved(oldAttachment);
         if (this.controllerUUID != null) {
-            HolderAttachment attachment = getAttachment();
-            if (attachment != null) {
-                ServerPlayer controller = attachment.getWorld().getServer().getPlayerList().getPlayer(this.controllerUUID);
-                if (controller != null) {
-                    removeCamera(controller);
-                }
+            ServerPlayer controller = fakePlayer.getServer().getPlayerList().getPlayer(this.controllerUUID);
+            if (controller != null) {
+                removeCamera(controller);
             }
             removeController(fakePlayer);
         }
