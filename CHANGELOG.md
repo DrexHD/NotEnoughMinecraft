@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Modded block texture support
+
 ## [1.2.3] - 2025-08-19
 ### Fixed
 - Softlocking when destroying a PC while playing on it

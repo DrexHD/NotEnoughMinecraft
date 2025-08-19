@@ -29,9 +29,9 @@ public class BlockColors {
 
     private static void loadColorMaps() {
         try {
-            GRASS_TEXTURE = ImageIO.read(new ByteArrayInputStream(RPHelper.loadTextureBytes(ResourceLocation.withDefaultNamespace("colormap/grass"))));
-            FOLIAGE_TEXTURE = ImageIO.read(new ByteArrayInputStream(RPHelper.loadTextureBytes(ResourceLocation.withDefaultNamespace("colormap/foliage"))));
-            DRY_FOLIAGE_TEXTURE = ImageIO.read(new ByteArrayInputStream(RPHelper.loadTextureBytes(ResourceLocation.withDefaultNamespace("colormap/dry_foliage"))));
+            GRASS_TEXTURE = ImageIO.read(RPHelper.getTexture(ResourceLocation.withDefaultNamespace("colormap/grass")));
+            FOLIAGE_TEXTURE = ImageIO.read(RPHelper.getTexture(ResourceLocation.withDefaultNamespace("colormap/foliage")));
+            DRY_FOLIAGE_TEXTURE = ImageIO.read(RPHelper.getTexture(ResourceLocation.withDefaultNamespace("colormap/dry_foliage")));
 
             GrassColor.init(GRASS_TEXTURE.getRGB(0, 0, GRASS_TEXTURE.getWidth(), GRASS_TEXTURE.getHeight(), null, 0, GRASS_TEXTURE.getWidth()));
             FoliageColor.init(FOLIAGE_TEXTURE.getRGB(0, 0, FOLIAGE_TEXTURE.getWidth(), FOLIAGE_TEXTURE.getHeight(), null, 0, FOLIAGE_TEXTURE.getWidth()));

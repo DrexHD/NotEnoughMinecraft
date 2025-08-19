@@ -162,7 +162,7 @@ public class Raytracer {
                 rpModel = BuiltinModels.conduitModel();
             else if (blockState.is(BlockTags.ALL_SIGNS))
                 rpModel = BuiltinModels.signModel(blockState);
-            else // load from vanilla rp
+            else // load from rp
                 rpModels = RPHelper.loadBlockModelViews(blockState);
 
             if (rpModels == null) {

@@ -26,10 +26,11 @@ public class NotEnoughMinecraft implements ModInitializer {
 	}
 
 	public static void initializeRenderer() {
-		BuiltinEntityModels.initModels();
-		BlockColors.init();
-
-		PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(resourcePackBuilder -> RPHelper.resourcePackBuilder = resourcePackBuilder);
+		PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(resourcePackBuilder -> {
+			RPHelper.resourcePackBuilder = resourcePackBuilder;
+			BuiltinEntityModels.initModels();
+			BlockColors.init();
+		});
 	}
 
 	public static ResourceLocation id(String path) {
