@@ -274,7 +274,9 @@ public class ComputerModel extends BlockModel {
     private void setController(ServerPlayer controller) {
         UUID uuid = controller.getUUID();
         UUID fakeUUID = new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() + 1);
-        var fakeProfile = new GameProfile(fakeUUID, "." + controller.getScoreboardName());
+        String fakeName = "." + controller.getScoreboardName();
+        if (fakeName.length() > 16) fakeName = fakeName.substring(0, 16);
+        var fakeProfile = new GameProfile(fakeUUID, fakeName);
         this.fakePlayer = new ComputerFakePlayer(controller.level(), fakeProfile);
         controller.getServer().getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), fakePlayer, new CommonListenerCookie(fakePlayer.getGameProfile(), 0, fakePlayer.clientInformation(), false));
         fakePlayer.gameMode.changeGameModeForPlayer(GameType.CREATIVE);

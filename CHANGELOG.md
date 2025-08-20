@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.5] - 2025-08-20
 ### Changed
 - Improved ray-tracer performance
 - Only send display updates to nearby players
+
+### Fixed
+- Player disconnects when playing with a 16-character name
 
 ## [1.2.4] - 2025-08-20
 ### Added
