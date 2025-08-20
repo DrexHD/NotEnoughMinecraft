@@ -10,8 +10,8 @@ import de.tomalbrc.cameraobscura.render.model.resource.RPElement;
 import de.tomalbrc.cameraobscura.render.model.resource.RPModel;
 import de.tomalbrc.cameraobscura.render.model.resource.state.MultipartDefinition;
 import de.tomalbrc.cameraobscura.render.model.resource.state.Variant;
+import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import me.drex.nem.block.model.ComputerModel;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
@@ -35,13 +35,16 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RPHelper {
-    public static ResourcePackBuilder resourcePackBuilder;
     private static final AssetContainer GLOBAL_ASSETS = ResourceLocatorApi.createGlobalAssetContainer();
 
     // Cache resourcepack models
@@ -49,6 +52,8 @@ public class RPHelper {
     private static final Map<BlockState, RPBlockState> blockStateResources = new ConcurrentHashMap<>();
 
     private static final Map<ResourceLocation, BufferedImage> textureCache = new ConcurrentHashMap<>();
+
+    private static FileSystem vanillaFilesystem;
 
     final public static Gson gson = new GsonBuilder()
         .registerTypeAdapter(ResourceLocation.class, new CachedResourceLocationDeserializer())
@@ -65,14 +70,27 @@ public class RPHelper {
         textureCache.clear();
     }
 
+    public static void init() {
+        try {
+            Path clientJar = PolymerCommonUtils.getClientJar();
+            if (clientJar == null) {
+                throw new RuntimeException("Could not get client jar");
+            }
+            vanillaFilesystem = FileSystems.newFileSystem(clientJar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static InputStream getAsset(ResourceLocation location, String type, String extension) {
         IoSupplier<InputStream> supplier = GLOBAL_ASSETS.getAsset(location.getNamespace(), type + "/" + location.getPath() + extension);
         if (supplier == null) {
-            byte[] data = resourcePackBuilder.getDataOrSource("assets/" + location.getNamespace() + "/" + type + "/" + location.getPath() + extension);
-            if (data != null) {
-                return new ByteArrayInputStream(data);
+            try {
+                Path path = vanillaFilesystem.getPath("/assets/" + location.getNamespace() + "/" + type + "/" + location.getPath() + extension);
+                return Files.newInputStream(path);
+            } catch (IOException e) {
+                return null;
             }
-            return null;
         }
         try {
             return supplier.get();

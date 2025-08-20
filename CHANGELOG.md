@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Potential crash during vanilla texture retrieval
+
 ## [1.2.5] - 2025-08-20
 ### Changed
 - Improved ray-tracer performance

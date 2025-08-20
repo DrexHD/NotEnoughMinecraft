@@ -19,6 +19,7 @@ public class NotEnoughMinecraft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		System.out.println("NotEnoughMinecraft#onInitialize");
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ModBlocks.init();
 		ModItems.init();
@@ -26,11 +27,9 @@ public class NotEnoughMinecraft implements ModInitializer {
 	}
 
 	public static void initializeRenderer() {
-		PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(resourcePackBuilder -> {
-			RPHelper.resourcePackBuilder = resourcePackBuilder;
-			BuiltinEntityModels.initModels();
-			BlockColors.init();
-		});
+		RPHelper.init();
+		BuiltinEntityModels.initModels();
+		BlockColors.init();
 	}
 
 	public static ResourceLocation id(String path) {
