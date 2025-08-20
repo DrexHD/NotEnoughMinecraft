@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Improved ray-tracer performance 
+- Improved ray-tracer performance
+- Only send display updates to nearby players
 
 ## [1.2.4] - 2025-08-20
 ### Added

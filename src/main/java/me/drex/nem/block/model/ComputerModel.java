@@ -1,6 +1,8 @@
 package me.drex.nem.block.model;
 
 import com.mojang.authlib.GameProfile;
+import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
+import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
 import me.drex.nem.config.ModConfig;
 import de.tomalbrc.cameraobscura.render.renderer.ImageRenderer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
@@ -31,6 +33,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Brightness;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -57,6 +60,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ComputerModel extends BlockModel {
 
     private static final Item[] defaultHotbar = new Item[]{Items.GRASS_BLOCK, Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.OAK_PLANKS, Items.OAK_LOG, Items.GLASS, Items.OAK_DOOR, Items.OAK_STAIRS};
+    public static final int DISPLAY_WIDTH = 160;
+    public static final int DISPLAY_HEIGHT = 144;
+
+    public static final Map<UUID, ComputerModel> controlledComputers = new HashMap<>();
+    // super cursed (doesn't take world into account, but it works)
+    public static final Map<BlockPos, BufferedImage> renderedFrames = new HashMap<>();
 
     private final ItemStack screen;
     private final ItemDisplayElement display;
@@ -66,15 +75,9 @@ public class ComputerModel extends BlockModel {
     private final SimpleEntityElement horse;
     private final ItemDisplayElement main;
     private final ItemDisplayElement[] hotbar = new ItemDisplayElement[9];
+    private final DataTrackerLike displayDataTracker = new SimpleDataTracker(EntityType.ITEM_DISPLAY);
 
-    public static final int DISPLAY_WIDTH = 160;
-    public static final int DISPLAY_HEIGHT = 144;
     private final AtomicBoolean rendering = new AtomicBoolean(false);
-
-    public static final Map<UUID, ComputerModel> controlledComputers = new HashMap<>();
-    // super cursed (doesn't take world into account, but it works)
-    public static final Map<BlockPos, BufferedImage> renderedFrames = new HashMap<>();
-
     private final BlockPos blockPos;
 
     // If the controllerUUID != null, fakePlayer needs to be != null
@@ -330,10 +333,7 @@ public class ComputerModel extends BlockModel {
         CompletableFuture.supplyAsync(renderer::render).thenAcceptAsync(pixels -> {
             try {
                 if (controllerUUID == null) return;
-                CustomModelData customModelData = new CustomModelData(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), IntArrayList.wrap(pixels));
-                this.screen.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
-                this.display.setItem(this.screen);
-                this.display.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+                updateScreen(pixels, false);
                 frameTimes.addLast(System.currentTimeMillis());
                 saveFrame(pixels);
             } catch (Throwable t) {
@@ -389,13 +389,21 @@ public class ComputerModel extends BlockModel {
     }
 
     private void clearScreen() {
-        CustomModelData customModelData = new CustomModelData(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), IntArrayList.wrap(new int[DISPLAY_WIDTH * DISPLAY_HEIGHT]));
-        this.screen.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
-        this.display.setItem(this.screen);
-        this.display.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+        updateScreen(new int[DISPLAY_WIDTH * DISPLAY_HEIGHT], true);
         for (int i = 0; i < 9; i++) {
             this.hotbar[i].setItem(ItemStack.EMPTY);
         }
         this.debug.setText(Component.literal(""));
+    }
+
+    private void updateScreen(int[] pixels, boolean forceUpdate) {
+        CustomModelData customModelData = new CustomModelData(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), IntArrayList.wrap(pixels));
+        this.screen.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
+        displayDataTracker.set(DisplayTrackedData.Item.ITEM, this.screen, true);
+        for (ServerGamePacketListenerImpl watchingPlayer : this.getWatchingPlayers()) {
+            if (forceUpdate || watchingPlayer.player.distanceToSqr(blockPos.getBottomCenter()) <= 6 * 6) {
+                watchingPlayer.send(new ClientboundSetEntityDataPacket(display.getEntityId(), displayDataTracker.getChangedEntries()));
+            }
+        }
     }
 }
