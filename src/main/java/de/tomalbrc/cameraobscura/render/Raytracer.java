@@ -1,15 +1,13 @@
 package de.tomalbrc.cameraobscura.render;
 
+import de.tomalbrc.cameraobscura.util.*;
+import me.drex.nem.block.ModBlocks;
 import me.drex.nem.config.ModConfig;
 import de.tomalbrc.cameraobscura.color.BlockColors;
 import de.tomalbrc.cameraobscura.color.MiscColors;
 import de.tomalbrc.cameraobscura.render.model.RenderModel;
 import de.tomalbrc.cameraobscura.render.model.resource.RPModel;
 import de.tomalbrc.cameraobscura.render.model.triangle.TriangleModel;
-import de.tomalbrc.cameraobscura.util.BuiltinEntityModels;
-import de.tomalbrc.cameraobscura.util.BuiltinModels;
-import de.tomalbrc.cameraobscura.util.ColorHelper;
-import de.tomalbrc.cameraobscura.util.RPHelper;
 import de.tomalbrc.cameraobscura.world.BlockIterator;
 import de.tomalbrc.cameraobscura.world.EntityIterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -18,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
@@ -45,7 +44,7 @@ public class Raytracer {
 
     private final ServerLevel level;
 
-    private static final Map<BlockState, List<RenderModel>> renderModelCache = new Reference2ObjectArrayMap<>();
+    private static final Map<BlockState, List<TriangleModel>> renderModelCache = new Reference2ObjectArrayMap<>();
     private static final Int2ObjectArrayMap<RenderModel> fluidRenderModelCache = new Int2ObjectArrayMap<>();
     //private final Long2ReferenceMap<TriangleModel> entityRenderModelCache = new Long2ReferenceArrayMap<>();
 
@@ -162,7 +161,10 @@ public class Raytracer {
                 rpModel = BuiltinModels.conduitModel();
             else if (blockState.is(BlockTags.ALL_SIGNS))
                 rpModel = BuiltinModels.signModel(blockState);
-            else // load from rp
+            else if (blockState.is(ModBlocks.COMPUTER))
+                rpModels = BuiltinModels.computerModel(blockState);
+            else
+                // load from rp
                 rpModels = RPHelper.loadBlockModelViews(blockState);
 
             if (rpModels == null) {
@@ -280,13 +282,28 @@ public class Raytracer {
         return (avgAlpha << 24) | (avgRed << 16) | (avgGreen << 8) | avgBlue;
     }
 
+    private List<TriangleModel> createOrGetCached(BlockPos blockPos, BlockState blockState, List<RPModel.View> views) {
+        List<TriangleModel> models = createOrGetCached0(blockState, views);
+        if (blockState.is(ModBlocks.COMPUTER)) {
+            // update texture
+            List<TriangleModel> texturedModels = new ObjectArrayList<>();
+            String posString = blockPos.getX() + "/" + blockPos.getY() + "/" + blockPos.getZ();
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(Constants.DYNAMIC_DISPLAY_TEXTURE, posString);
 
-    private List<RenderModel> createOrGetCached(BlockState blockState, List<RPModel.View> views) {
+            for (TriangleModel model : models) {
+                texturedModels.add(model.withTexture("display", texture));
+            }
+            return texturedModels;
+        }
+        return models;
+    }
+
+    private List<TriangleModel> createOrGetCached0(BlockState blockState, List<RPModel.View> views) {
         if (renderModelCache.containsKey(blockState)) {
             return renderModelCache.get(blockState);
         }
         else {
-            List<RenderModel> list = renderModelCache.computeIfAbsent(blockState, k -> new ObjectArrayList<>());
+            List<TriangleModel> list = renderModelCache.computeIfAbsent(blockState, k -> new ObjectArrayList<>());
             for (int i = 0; i < views.size(); i++) {
                 var model = new TriangleModel(views.get(i));
                 list.add(model);
@@ -329,7 +346,7 @@ public class Raytracer {
             renderModels.add(createOrGetCached(result.fluidState().getAmount() + (result.fluidState().getType() == result.fluidStateAbove().getType() ? 1:0) + (result.fluidState().is(FluidTags.LAVA) ? 100:0), lm));
         }
 
-        renderModels.addAll(createOrGetCached(result.blockState(), views));
+        renderModels.addAll(createOrGetCached(result.blockPos(), result.blockState(), views));
 
         return renderModels;
     }

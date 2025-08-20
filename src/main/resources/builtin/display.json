@@ -1,0 +1,16 @@
+{
+	"texture_size": [160, 144],
+	"textures": {
+		"display": "dynamic:display"
+	},
+	"elements": [
+		{
+			"from": [2, 3, 3],
+			"to": [14, 12, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 3, 4]},
+			"faces": {
+				"north": {"uv": [0, 0, 160, 144], "texture": "#display"}
+			}
+		}
+	]
+}

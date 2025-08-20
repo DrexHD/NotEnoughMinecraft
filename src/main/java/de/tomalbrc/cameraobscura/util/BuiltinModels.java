@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import me.drex.nem.block.ComputerBlock;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -154,5 +157,24 @@ public class BuiltinModels {
         skyModel = view;
 
         return view;
+    }
+
+    static RPModel displayModel = null;
+    public static RPModel displayModel() {
+        if (displayModel == null) {
+            displayModel = RPHelper.loadModel(BuiltinModels.class.getResourceAsStream("/builtin/display.json"));
+        }
+        return displayModel;
+    }
+
+    public static List<RPModel.View> computerModel(BlockState blockState) {
+        List<RPModel.View> views = RPHelper.loadBlockModelViews(blockState);
+        if (views == null) return null;
+        views = new ObjectArrayList<>(views);
+
+        RPModel model = displayModel();
+        Direction direction = blockState.getValue(ComputerBlock.FACING);
+        views.add(new RPModel.View(model, new Vector3f(0, direction.toYRot(), 0)));
+        return views;
     }
 }

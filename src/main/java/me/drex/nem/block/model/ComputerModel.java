@@ -19,6 +19,7 @@ import me.drex.nem.logic.ComputerFakePlayer;
 import me.drex.nem.logic.FakeClientConnection;
 import me.drex.nem.logic.PlayerAction;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.DisconnectionDetails;
@@ -48,6 +49,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,6 +72,10 @@ public class ComputerModel extends BlockModel {
     private final AtomicBoolean rendering = new AtomicBoolean(false);
 
     public static final Map<UUID, ComputerModel> controlledComputers = new HashMap<>();
+    // super cursed (doesn't take world into account, but it works)
+    public static final Map<BlockPos, BufferedImage> renderedFrames = new HashMap<>();
+
+    private final BlockPos blockPos;
 
     // If the controllerUUID != null, fakePlayer needs to be != null
     private UUID controllerUUID;
@@ -79,7 +85,8 @@ public class ComputerModel extends BlockModel {
     private boolean showDebug = false;
     private final ArrayDeque<Long> frameTimes = new ArrayDeque<>();
 
-    public ComputerModel(BlockState blockState) {
+    public ComputerModel(BlockPos blockPos, BlockState blockState) {
+        this.blockPos = blockPos;
         this.screen = new ItemStack(Items.TRIAL_KEY);
         this.screen.set(DataComponents.ITEM_MODEL, NotEnoughMinecraft.id("screen"));
         this.display = new ItemDisplayElement(this.screen);
@@ -242,6 +249,7 @@ public class ComputerModel extends BlockModel {
         }
 
         renderImage(fakePlayer);
+        updateFps();
         renderHotbar(fakePlayer);
         setFakePlayerInput(fakePlayer, input);
 
@@ -280,6 +288,7 @@ public class ComputerModel extends BlockModel {
     private void removeController(FakePlayer fakePlayer) {
         fakePlayer.connection.onDisconnect(new DisconnectionDetails(Component.literal("Remove Fake Player")));
         controlledComputers.remove(this.controllerUUID);
+        renderedFrames.remove(blockPos);
         this.fakePlayer = null;
         this.controllerUUID = null;
         this.removeElement(interaction);
@@ -325,18 +334,41 @@ public class ComputerModel extends BlockModel {
                 this.screen.set(DataComponents.CUSTOM_MODEL_DATA, customModelData);
                 this.display.setItem(this.screen);
                 this.display.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+                frameTimes.addLast(System.currentTimeMillis());
+                saveFrame(pixels);
             } catch (Throwable t) {
                 t.printStackTrace();
             } finally {
                 rendering.set(false);
             }
         }, fakePlayer.getServer());
-        updateFps();
+    }
+
+    private void saveFrame(int[] pixels) {
+        BlockPos blockPos = this.blockPos();
+
+        int width = ComputerModel.DISPLAY_WIDTH;
+        int height = ComputerModel.DISPLAY_HEIGHT;
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int[] texture = new int[width * height];
+        System.arraycopy(pixels, 0, texture, 0, texture.length);
+
+        // flip
+        for (int y = 0; y < height; y++) {
+            int rowStart = y * width;
+            int rowEnd = rowStart + width - 1;
+            for (int x = 0; x < width; x++) {
+                texture[rowStart + x] = pixels[rowEnd - x];
+            }
+        }
+
+        image.setRGB(0, 0, width, height, texture, 0, width);
+        renderedFrames.put(blockPos, image);
     }
 
     private void updateFps() {
         long now = System.currentTimeMillis();
-        frameTimes.addLast(now);
 
         long cutoff = now - 1_000L;
         while (!frameTimes.isEmpty() && frameTimes.getFirst() < cutoff) {

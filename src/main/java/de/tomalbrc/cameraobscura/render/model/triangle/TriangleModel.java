@@ -36,6 +36,17 @@ public class TriangleModel implements RenderModel {
         this.readModel(view);
     }
 
+    private TriangleModel() {
+    }
+
+    public TriangleModel withTexture(String key, ResourceLocation texture) {
+        TriangleModel triangleModel = new TriangleModel();
+        triangleModel.modelTriangles.addAll(modelTriangles);
+        triangleModel.textureMap.putAll(textureMap);
+        triangleModel.textureMap.put(key, texture);
+        return triangleModel;
+    }
+
     private void readModel(RPModel.View modelView) {
         var elementList = modelView.collectElements();
         for (int i = 0; i < elementList.size(); i++) {

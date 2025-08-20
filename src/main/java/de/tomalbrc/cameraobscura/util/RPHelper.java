@@ -13,7 +13,9 @@ import de.tomalbrc.cameraobscura.render.model.resource.state.Variant;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import me.drex.nem.block.model.ComputerModel;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -31,10 +33,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
@@ -149,14 +148,8 @@ public class RPHelper {
             var img = imageFromBytes(getPlayerTexture(path.getPath()));
             textureCache.put(path, img);
             return img;
-        } else if (path.getNamespace().equals(Constants.DYNAMIC_SIGN_TEXTURE)) {
-            var img = imageFromBytes(getPlayerTexture(path.getPath()));
-            textureCache.put(path, img);
-            return img;
-        } else if (path.getNamespace().equals(Constants.DYNAMIC_MAP_TEXTURE)) {
-            var img = imageFromBytes(getPlayerTexture(path.getPath()));
-            textureCache.put(path, img);
-            return img;
+        } else if (path.getNamespace().equals(Constants.DYNAMIC_DISPLAY_TEXTURE)) {
+            return getDisplayTexture(path.getPath());
         }
 
         try {
@@ -204,6 +197,12 @@ public class RPHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static BufferedImage getDisplayTexture(String posString) {
+        String[] split = posString.split("/");
+        BlockPos blockPos = new BlockPos(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+        return ComputerModel.renderedFrames.get(blockPos);
     }
 
     public static List<RPModel.View> loadModel(RPBlockState rpBlockState, BlockState blockState) {

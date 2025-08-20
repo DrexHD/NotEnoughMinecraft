@@ -51,7 +51,7 @@ public class ComputerBlock extends HorizontalDirectionalBlock implements Factory
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
-        return new ComputerModel(initialBlockState);
+        return new ComputerModel(pos, initialBlockState);
     }
 
     @Override

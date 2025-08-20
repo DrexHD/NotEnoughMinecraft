@@ -1,7 +1,20 @@
 {
   "variants": {
-    "": {
-      "model": "not-enough-minecraft:block/computer"
+    "facing=north": {
+      "model": "not-enough-minecraft:block/computer",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "not-enough-minecraft:block/computer",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "not-enough-minecraft:block/computer",
+      "y": 0
+    },
+    "facing=west": {
+      "model": "not-enough-minecraft:block/computer",
+      "y": 90
     }
   }
 }

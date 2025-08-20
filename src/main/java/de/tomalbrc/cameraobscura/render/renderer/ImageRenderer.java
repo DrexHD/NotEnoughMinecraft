@@ -24,10 +24,14 @@ public class ImageRenderer extends AbstractRenderer<int[]> {
         pool.submit(() -> {
             // https://stackoverflow.com/questions/21163108/custom-thread-pool-in-java-8-parallel-stream
             rays.parallelStream().forEach(ray -> {
-                int color = raytracer.trace(eyes, ray.direction());
-                int x = width - ray.xOrigin() - 1;
-                int y = ray.yOrigin();
-                pixels[x + width * y] = color;
+                try {
+                    int color = raytracer.trace(eyes, ray.direction());
+                    int x = width - ray.xOrigin() - 1;
+                    int y = ray.yOrigin();
+                    pixels[x + width * y] = color;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
             });
         }).join();
 

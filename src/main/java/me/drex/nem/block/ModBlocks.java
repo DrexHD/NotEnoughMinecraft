@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.function.Function;
 
@@ -19,6 +20,7 @@ public class ModBlocks {
         BlockBehaviour.Properties.of()
             .mapColor(MapColor.STONE)
             .noCollission()
+            .pushReaction(PushReaction.BLOCK)
             .instrument(NoteBlockInstrument.BASEDRUM)
             .requiresCorrectToolForDrops()
             .strength(1.5F, 6.0F)
