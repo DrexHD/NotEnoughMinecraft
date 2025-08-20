@@ -2,6 +2,7 @@ package de.tomalbrc.cameraobscura.color;
 
 import de.tomalbrc.cameraobscura.util.RPHelper;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
@@ -21,6 +22,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class BlockColors {
     private static BufferedImage GRASS_TEXTURE;
@@ -45,7 +49,7 @@ public class BlockColors {
         int get(LevelChunk level, BlockState blockState, BlockPos blockPos);
     }
 
-    private static final Reference2ObjectArrayMap<Block, BlockColorProvider> colors = new Reference2ObjectArrayMap<>();
+    private static final Map<Block, BlockColorProvider> colors = new IdentityHashMap<>();
 
     public static void init() {
         loadColorMaps();
@@ -112,8 +116,9 @@ public class BlockColors {
     }
 
     public static int get(LevelChunk level, BlockState blockState, BlockPos blockPos) {
-        if (colors.containsKey(blockState.getBlock()))
-            return colors.get(blockState.getBlock()).get(level, blockState, blockPos) | 0xff_00_00_00;
+        BlockColorProvider colorProvider = colors.get(blockState.getBlock());
+        if (colorProvider != null)
+            return colorProvider.get(level, blockState, blockPos) | 0xff_00_00_00;
 
         return -1;
     }

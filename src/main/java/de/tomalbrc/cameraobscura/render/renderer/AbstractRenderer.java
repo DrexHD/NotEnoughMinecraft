@@ -17,14 +17,11 @@ public abstract class AbstractRenderer<T> implements Renderer<T> {
     protected final LivingEntity entity;
     protected final Raytracer raytracer;
 
-    protected static final ExecutorService executor = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()-1));
-
     public AbstractRenderer(LivingEntity entity, int width, int height, int renderDistance) {
         this.entity = entity;
         this.width = width;
         this.height = height;
         this.raytracer = new Raytracer(this.entity, renderDistance);
-        this.raytracer.preloadChunks(entity.getOnPos());
     }
 
     public static Vec3 yawPitchRotation(Vec3 base, double angleYaw, double anglePitch) {

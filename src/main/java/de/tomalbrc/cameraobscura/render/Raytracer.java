@@ -11,7 +11,6 @@ import de.tomalbrc.cameraobscura.render.model.triangle.TriangleModel;
 import de.tomalbrc.cameraobscura.world.BlockIterator;
 import de.tomalbrc.cameraobscura.world.EntityIterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
@@ -29,7 +28,6 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.Vector3f;
@@ -61,15 +59,10 @@ public class Raytracer {
         this.level = (ServerLevel) entity.level();
         this.distance = distance;
 
-        var cache = new Long2ObjectOpenHashMap<LevelChunk>();
-        this.blockIterator = new BlockIterator(this.level, cache);
-        this.entityIterator = new EntityIterator(this.level, cache, entity);
+        this.blockIterator = new BlockIterator(this.level, entity, distance);
+        this.entityIterator = new EntityIterator(this.level, entity);
 
         this.skyDarken = this.level.getSkyDarken();
-    }
-
-    public void preloadChunks(BlockPos center) {
-        this.blockIterator.preloadChunks(center, distance);
     }
 
     public int trace(Vec3 pos, Vec3 direction) {

@@ -13,7 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -21,16 +20,16 @@ import org.joml.Vector3fc;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-public class EntityIterator extends AbstractWorldIterator<EntityIterator.EntityHit> {
+public class EntityIterator {
+    private final ServerLevel level;
     private final LivingEntity entity;
 
     private final List<EntityHit> allEntities;
 
-    public EntityIterator(ServerLevel level, Map<Long, LevelChunk> cachedChunks, LivingEntity entity1) {
-        super(level, cachedChunks);
+    public EntityIterator(ServerLevel level, LivingEntity entity1) {
+        this.level = level;
         this.entity = entity1;
 
         this.allEntities = new ObjectArrayList<>();
@@ -72,7 +71,6 @@ public class EntityIterator extends AbstractWorldIterator<EntityIterator.EntityH
         return dotProduct >= Math.cos(Math.toRadians(fov) / 2.0);
     }
 
-    @Override
     public List<EntityHit> raycast(ClipContext clipContext) {
         List<EntityHit> hits = new ObjectArrayList<>();
         for (int i = 0; i < this.allEntities.size(); i++) {
