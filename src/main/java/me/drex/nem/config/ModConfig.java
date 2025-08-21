@@ -44,6 +44,7 @@ public class ModConfig {
     };
     public boolean allowPlacing = true;
     public boolean allowBreaking = true;
+    public boolean allowItemUsage = true;
     public boolean allowDropping = false;
     public boolean allowPicking = true;
 

@@ -82,6 +82,7 @@ public class ComputerModel extends BlockModel {
     // If the controllerUUID != null, fakePlayer needs to be != null
     private UUID controllerUUID;
     private FakePlayer fakePlayer;
+    private boolean usingItem = false;
 
     // debug
     private boolean showDebug = false;
@@ -122,6 +123,7 @@ public class ComputerModel extends BlockModel {
 
                 if (player.getUUID() == ComputerModel.this.controllerUUID) {
                     PlayerAction.USE.perform(fakePlayer);
+                    usingItem = true;
                 }
             }
 

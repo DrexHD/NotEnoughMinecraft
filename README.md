@@ -13,6 +13,7 @@ Did you ever want to play Minecraft inside of Minecraft without installing any m
 - The input for movement, jumping and sprinting is the same as your default inputs
 - Breaking, placing, dropping and picking blocks also use your default inputs
 - Use the scroll wheel or number keys to navigate the hotbar
+- You can right-click *(to start)* using an item. *You can right-click again to finish using the item.*
 - You can sneak to stop playing and exit the computer
 - You can press your inventory key to toggle a fps counter
 
@@ -61,6 +62,8 @@ The config is located at `config/not-enough-minecraft.json`.
   "allowPlacing": true,
   // Should fake player be allowed to break blocks
   "allowBreaking": true,
+  // Should fake player be allowed to use items
+  "allowItemUsage": true,
   // Should fake player be allowed to drop items
   "allowDropping": false,
   // Should fake player be allowed to pick items from block

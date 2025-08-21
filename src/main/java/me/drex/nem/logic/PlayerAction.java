@@ -19,9 +19,6 @@ public enum PlayerAction {
         public void perform(ServerPlayer player) {
             HitResult pick = GameRenderer.pick(player);
             switch (pick.getType()) {
-                case ENTITY -> {
-                    // TODO
-                }
                 case BLOCK -> {
                     if (!ModConfig.getInstance().allowBreaking) return;
                     ServerLevel level = player.level();
@@ -38,11 +35,11 @@ public enum PlayerAction {
         @Override
         public void perform(ServerPlayer player) {
             HitResult pick = GameRenderer.pick(player);
+            ServerLevel level = player.level();
             switch (pick.getType()) {
                 case BLOCK -> {
                     if (!ModConfig.getInstance().allowPlacing) return;
                     player.resetLastActionTime();
-                    ServerLevel level = player.level();
                     BlockHitResult blockHit = (BlockHitResult) pick;
                     BlockPos hitPos = blockHit.getBlockPos();
                     Direction direction = blockHit.getDirection();
@@ -53,6 +50,22 @@ public enum PlayerAction {
                                 player.swing(InteractionHand.MAIN_HAND);
                             }
                         }
+                    }
+                }
+                case MISS -> {
+                    if (!ModConfig.getInstance().allowItemUsage) return;
+                    InteractionHand interactionHand = InteractionHand.MAIN_HAND;
+                    player.resetLastActionTime();
+                    if (!player.isUsingItem()) {
+                        ItemStack itemStack = player.getItemInHand(interactionHand);
+                        if (!itemStack.isEmpty()) {
+                            if (player.gameMode.useItem(player, level, itemStack, interactionHand) instanceof InteractionResult.Success success
+                                && success.swingSource() == InteractionResult.SwingSource.SERVER) {
+                                player.swing(interactionHand, true);
+                            }
+                        }
+                    } else {
+                        player.releaseUsingItem();
                     }
                 }
             }
