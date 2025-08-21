@@ -11,9 +11,10 @@ Did you ever want to play Minecraft inside of Minecraft without installing any m
 
 ## Controls
 - The input for movement, jumping and sprinting is the same as your default inputs
+- Breaking, placing, dropping and picking blocks also use your default inputs
 - Use the scroll wheel or number keys to navigate the hotbar
 - You can sneak to stop playing and exit the computer
-- You can press your pick block key to toggle a fps counter
+- You can press your inventory key to toggle a fps counter
 
 *Because this is a serverside-only mod, it is limited to inputs the client sends to it!*
 
@@ -55,7 +56,15 @@ The config is located at `config/not-enough-minecraft.json`.
     "item replace entity @s hotbar.6 with minecraft:glass",
     "item replace entity @s hotbar.7 with minecraft:oak_door",
     "item replace entity @s hotbar.8 with minecraft:oak_stairs"
-  ]
+  ],
+  // Should fake player be allowed to place blocks
+  "allowPlacing": true,
+  // Should fake player be allowed to break blocks
+  "allowBreaking": true,
+  // Should fake player be allowed to drop items
+  "allowDropping": false,
+  // Should fake player be allowed to pick items from block
+  "allowPicking": true
 }
 
 ```

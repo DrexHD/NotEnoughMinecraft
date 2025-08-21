@@ -42,6 +42,10 @@ public class ModConfig {
         "item replace entity @s hotbar.7 with minecraft:oak_door",
         "item replace entity @s hotbar.8 with minecraft:oak_stairs",
     };
+    public boolean allowPlacing = true;
+    public boolean allowBreaking = true;
+    public boolean allowDropping = false;
+    public boolean allowPicking = true;
 
     public static ModConfig getInstance() {
         if (instance == null) {

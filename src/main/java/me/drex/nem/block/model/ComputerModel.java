@@ -134,12 +134,9 @@ public class ComputerModel extends BlockModel {
 
             @Override
             public void pickItem(ServerPlayer player, boolean includeData) {
-                if (showDebug) {
-                    removeElement(debug);
-                } else {
-                    addElement(debug);
+                if (player.getUUID() == ComputerModel.this.controllerUUID) {
+                    PlayerAction.PICK_ITEM.perform(fakePlayer);
                 }
-                showDebug = !showDebug;
             }
         });
         this.interaction.setSize(1.1f, 1.1f);
@@ -314,6 +311,22 @@ public class ComputerModel extends BlockModel {
 
     public void setSelectedSlot(int selectedSlot) {
         fakePlayer.getInventory().setSelectedSlot(selectedSlot);
+    }
+
+    public void onInventoryOpen() {
+        if (showDebug) {
+            removeElement(debug);
+        } else {
+            addElement(debug);
+        }
+        showDebug = !showDebug;
+    }
+
+    public void onPlayerAction(ServerboundPlayerActionPacket.Action action) {
+        switch (action) {
+            case DROP_ITEM -> PlayerAction.DROP.perform(fakePlayer);
+            case DROP_ALL_ITEMS -> PlayerAction.DROP_ALL.perform(fakePlayer);
+        }
     }
 
     private void setFakePlayerInput(FakePlayer fakePlayer, Input input) {

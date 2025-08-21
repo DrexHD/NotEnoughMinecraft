@@ -2,9 +2,7 @@ package me.drex.nem.mixin;
 
 import me.drex.nem.block.model.ComputerModel;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundPlayerRotationPacket;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
@@ -62,6 +60,37 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
             computerModel.setSelectedSlot(packet.getSlot());
             ci.cancel();
         }
+    }
 
+    @Inject(
+        method = "handlePlayerCommand",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;getVehicle()Lnet/minecraft/world/entity/Entity;"
+        ),
+        cancellable = true
+    )
+    public void detectInventoryOpen(ServerboundPlayerCommandPacket packet, CallbackInfo ci) {
+        ComputerModel computerModel = ComputerModel.controlledComputers.get(player.getUUID());
+        if (computerModel != null) {
+            computerModel.onInventoryOpen();
+            ci.cancel();
+        }
+    }
+
+    @Inject(
+        method = "handlePlayerAction",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;resetLastActionTime()V"
+        ),
+        cancellable = true
+    )
+    public void detectPlayerAction(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
+        ComputerModel computerModel = ComputerModel.controlledComputers.get(player.getUUID());
+        if (computerModel != null) {
+            computerModel.onPlayerAction(packet.getAction());
+            ci.cancel();
+        }
     }
 }

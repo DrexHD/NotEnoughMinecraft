@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `spawnCommands` config option
+- `allowPlacing`, `allowBreaking`, `allowDropping` and `allowPicking` config options
+- Ability to pick items from blocks
 
 ### Fixed
 - Rare invalid player movement disconnect
