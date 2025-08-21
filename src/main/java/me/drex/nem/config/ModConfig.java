@@ -18,9 +18,9 @@ public class ModConfig {
     private static ModConfig instance;
 
     private static final Gson gson = new GsonBuilder()
-            .registerTypeHierarchyAdapter(ResourceLocation.class, new CachedResourceLocationDeserializer())
-            .setPrettyPrinting()
-            .create();
+        .registerTypeHierarchyAdapter(ResourceLocation.class, new CachedResourceLocationDeserializer())
+        .setPrettyPrinting()
+        .create();
 
     public int renderDistance = 64;
 
@@ -31,6 +31,17 @@ public class ModConfig {
     public int fov = 70;
     public int biomeBlend = 1;
     public int renderThreadCount = 4;
+    public String[] spawnCommands = new String[]{
+        "item replace entity @s hotbar.0 with minecraft:grass_block",
+        "item replace entity @s hotbar.1 with minecraft:dirt",
+        "item replace entity @s hotbar.2 with minecraft:stone",
+        "item replace entity @s hotbar.3 with minecraft:cobblestone",
+        "item replace entity @s hotbar.4 with minecraft:oak_planks",
+        "item replace entity @s hotbar.5 with minecraft:oak_log",
+        "item replace entity @s hotbar.6 with minecraft:glass",
+        "item replace entity @s hotbar.7 with minecraft:oak_door",
+        "item replace entity @s hotbar.8 with minecraft:oak_stairs",
+    };
 
     public static ModConfig getInstance() {
         if (instance == null) {
@@ -39,6 +50,7 @@ public class ModConfig {
         }
         return instance;
     }
+
     public static boolean load() {
         if (!CONFIG_FILE_PATH.toFile().exists()) {
             instance = new ModConfig();

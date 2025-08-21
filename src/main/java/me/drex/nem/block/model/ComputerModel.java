@@ -21,6 +21,7 @@ import me.drex.nem.logic.ComputerFakePlayer;
 import me.drex.nem.logic.FakeClientConnection;
 import me.drex.nem.logic.PlayerAction;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -40,7 +41,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -59,7 +59,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ComputerModel extends BlockModel {
 
-    private static final Item[] defaultHotbar = new Item[]{Items.GRASS_BLOCK, Items.DIRT, Items.STONE, Items.COBBLESTONE, Items.OAK_PLANKS, Items.OAK_LOG, Items.GLASS, Items.OAK_DOOR, Items.OAK_STAIRS};
     public static final int DISPLAY_WIDTH = 160;
     public static final int DISPLAY_HEIGHT = 144;
 
@@ -277,10 +276,14 @@ public class ComputerModel extends BlockModel {
         if (fakeName.length() > 16) fakeName = fakeName.substring(0, 16);
         var fakeProfile = new GameProfile(fakeUUID, fakeName);
         this.fakePlayer = new ComputerFakePlayer(controller.level(), fakeProfile);
-        controller.getServer().getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), fakePlayer, new CommonListenerCookie(fakePlayer.getGameProfile(), 0, fakePlayer.clientInformation(), false));
+        MinecraftServer server = controller.getServer();
+        CommandSourceStack source = server.createCommandSourceStack()
+            .withSuppressedOutput()
+            .withEntity(fakePlayer);
+        server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), fakePlayer, new CommonListenerCookie(fakePlayer.getGameProfile(), 0, fakePlayer.clientInformation(), false));
         fakePlayer.gameMode.changeGameModeForPlayer(GameType.CREATIVE);
-        for (int i = 0; i < 9; i++) {
-            fakePlayer.getInventory().setItem(i, new ItemStack(defaultHotbar[i]));
+        for (String spawnCommand : ModConfig.getInstance().spawnCommands) {
+            server.getCommands().performPrefixedCommand(source, spawnCommand);
         }
 
         this.addElement(interaction);
