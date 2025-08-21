@@ -19,7 +19,6 @@ public class NotEnoughMinecraft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		System.out.println("NotEnoughMinecraft#onInitialize");
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ModBlocks.init();
 		ModItems.init();
