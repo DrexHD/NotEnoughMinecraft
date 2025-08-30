@@ -1,8 +1,6 @@
 package de.tomalbrc.cameraobscura.color;
 
 import de.tomalbrc.cameraobscura.util.RPHelper;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
@@ -20,9 +18,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2025-08-30
+### Added
+- `${controller}` and `${fake_player}` placeholders to `spawnCommands` config
+
 ## [1.3.0] - 2025-08-21
 ### Added
 - `spawnCommands` config option

@@ -21,7 +21,7 @@ Did you ever want to play Minecraft inside of Minecraft without installing any m
 
 ## How it works
 When playing, a fake player is created and added to the server. Each tick an image is rendered using a [server-side 
-raytracing renderer](https://modrinth.com/mod/camera-obscura) from [tomalbrc](https://modrinth.com/user/tomalbrc).
+raycasting renderer](https://modrinth.com/mod/camera-obscura) from [tomalbrc](https://modrinth.com/user/tomalbrc).
 The rendered image is then displayed to the client using a custom screen item, where each pixel can be colored
 using [custom model data](https://minecraft.wiki/w/Data_component_format#custom_model_data) colors.
 
@@ -47,6 +47,7 @@ The config is located at `config/not-enough-minecraft.json`.
   "renderThreadCount": 4,
   // A list of commands that get executed when a fake player entity is spawned
   // This can for example be used to give custom items or move to specific locations
+  // ${controller} and ${fake_player} are arguments for the controlling player and fake player name
   "spawnCommands": [
     "item replace entity @s hotbar.0 with minecraft:grass_block",
     "item replace entity @s hotbar.1 with minecraft:dirt",

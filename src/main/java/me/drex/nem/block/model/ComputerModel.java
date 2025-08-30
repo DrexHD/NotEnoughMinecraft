@@ -282,6 +282,7 @@ public class ComputerModel extends BlockModel {
         server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), fakePlayer, new CommonListenerCookie(fakePlayer.getGameProfile(), 0, fakePlayer.clientInformation(), false));
         fakePlayer.gameMode.changeGameModeForPlayer(GameType.CREATIVE);
         for (String spawnCommand : ModConfig.getInstance().spawnCommands) {
+            spawnCommand = spawnCommand.replace("${controller}", controller.getScoreboardName()).replace("${fake_player}", fakePlayer.getScoreboardName());
             server.getCommands().performPrefixedCommand(source, spawnCommand);
         }
 
